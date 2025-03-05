@@ -1,0 +1,13 @@
+import google.generativeai as genai
+genai.configure(api_key="?")
+
+def two_text_comparison(text1, text2):
+    model = genai.GenerativeModel("gemini-1.5-pro")
+    response = model.generate_content(f"compare these two text: '{text1}' and '{text2}' . Are they similar or different?")
+    return response.text
+
+if __name__ == "__main__":
+    text1 = input("Enter your first text:")
+    text2 = input("Enter your second text:")
+    comparison = two_text_comparison(text1,text2)
+    print("Comparison:", comparison)
