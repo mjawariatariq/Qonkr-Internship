@@ -1,0 +1,13 @@
+import google.generativeai as genai
+genai.configure(api_key="?")
+
+
+def analyze_sentiment(text):
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        response = model.generate_content(f"Analyze the sentiment of this text: '{text}'. Is it Positive, Negative, or Neutral?")
+        
+        return response.text
+if __name__ == "__main__":
+    text = input("Enter your text: ")
+    sentiment = analyze_sentiment(text)
+    print("Sentiment:", sentiment)
