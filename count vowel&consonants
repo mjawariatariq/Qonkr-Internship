@@ -1,0 +1,12 @@
+def count_vowels_consonants(text):
+    vowels = "AEIOUaeiou"
+    consonants = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz"
+    
+    vowel_count = sum(1 for char in text if char in vowels)
+    consonant_count = sum(1 for char in text if char in consonants)
+
+    print("Number of vowels:", vowel_count)
+    print("Number of consonants:", consonant_count)
+
+text = input("Enter a string: ")
+count_vowels_consonants(text)
