@@ -1,0 +1,9 @@
+from transformers import pipeline, BertTokenizer
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+
+def hugging_face_tokenizer(text):
+    tokens = tokenizer.tokenize(text)
+    return tokens
+
+text = input("Enter your text: ")
+print("Tokens:", hugging_face_tokenizer(text))
