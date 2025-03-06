@@ -6,12 +6,19 @@ def extract_companies_locations(text):
     result = ner_pipeline(text)
     companies = []
     locations = []
-    for items in result:
-        if items["entity"] == "ORG":
-            companies.append(items["word"])
-        elif items["entity"] == "LOC":
-            locations.append(items["word"])
-            return companies, locations
-        text = "Google opened a new office in New York. Microsoft is expanding in Seattle. Tesla is building a factory in Berlin."        
-        companies, locations = extract_companies_locations(text)
-        print("Companies and Locations:", extract_companies_locations(text))
+
+    for item in result:
+        if item["entity_group"] == "ORG":  
+            companies.append(item["word"])
+        elif item["entity_group"] == "LOC":
+            locations.append(item["word"])
+
+    return companies, locations  
+
+
+text = "Google opened a new office in New York. Microsoft is expanding in Seattle. Tesla is building a factory in Berlin."
+
+
+companies, locations = extract_companies_locations(text)
+print("Companies:", companies)
+print("Locations:", locations)
