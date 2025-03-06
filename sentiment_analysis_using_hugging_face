@@ -1,0 +1,12 @@
+from transformers import pipeline
+
+sentiment_analyzer = pipeline("sentiment-analysis")
+def sentiment_analysis(text):
+    result = sentiment_analyzer(text)[0]
+    return result["label"]
+
+if __name__ == "__main__":
+    text = input("Enter your text: ")
+    sentiment = sentiment_analysis(text)
+    print("Sentiment:", sentiment)
+    
