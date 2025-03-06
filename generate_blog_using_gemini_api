@@ -1,0 +1,26 @@
+import google.generativeai as genai
+
+genai.configure(api_key="?")
+
+def generate_blog(topic):
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        
+        prompt = f"""
+        Generate a complete blog post about '{topic}' with the following sections:
+        - Title
+        - A 300-word blog description
+        - 5 related keywords
+        - SEO meta title
+        - SEO meta description
+        - A suitable image description
+        Provide the response in a structured format.
+        """
+        
+        response = model.generate_content(prompt)
+        
+        return {"Blog Post": response.text}
+
+if __name__ == "__main__":
+    topic = input("Enter the blog topic: ")
+    blog = generate_blog(topic)
+    print(blog)
