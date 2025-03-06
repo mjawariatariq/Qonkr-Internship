@@ -1,0 +1,17 @@
+from transformers import pipeline
+
+ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", aggregation_strategy="simple")
+
+def extract_companies_locations(text):
+    result = ner_pipeline(text)
+    companies = []
+    locations = []
+    for items in result:
+        if items["entity"] == "ORG":
+            companies.append(items["word"])
+        elif items["entity"] == "LOC":
+            locations.append(items["word"])
+            return companies, locations
+        text = "Google opened a new office in New York. Microsoft is expanding in Seattle. Tesla is building a factory in Berlin."        
+        companies, locations = extract_companies_locations(text)
+        print("Companies and Locations:", extract_companies_locations(text))
