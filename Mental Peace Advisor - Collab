@@ -1,0 +1,162 @@
+#Zaroori libraries import kar rahay hain
+import ipywidgets as widgets
+from IPython.display import display, clear_output
+import google.generativeai as ai
+import re  # Bold formatting ke liye regex ka use
+
+#Google generative AI ka API key configure kar rahay hain
+ai.configure(api_key="AIzaSyAYnk8L9S2ahnE0GXggVMEOcRMUJHHsQkI")
+
+#AI response ka config set kiya gaya hai
+config = {
+    "temperature": 0.5,
+    "response_mime_type": "text/plain"
+}
+#Gemini model select kiya gaya hai
+model = ai.GenerativeModel('gemini-2.5-flash-preview-04-17', generation_config=config)
+
+#Styled chat history box design kar rahay hain
+chat_history = widgets.HTML(
+    value="",
+    layout=widgets.Layout(
+        border='1px solid #ccc',
+        height='350px',
+        overflow_y='auto',
+        padding='10px',
+        background_color='#f9f9f9',
+        width='100%',
+        font_family='Arial, sans-serif'
+    )
+)
+
+#User input ke liye text box banaya gaya hai
+user_input = widgets.Text(
+    value='',
+    placeholder='Type your message here...',
+    description='You:',
+    disabled=False,
+    layout=widgets.Layout(width='80%')
+)
+
+#Send button design kiya gaya hai
+send_button = widgets.Button(
+    description='Send',
+    button_style='success',
+    layout=widgets.Layout(width='15%')
+)
+
+#Conversation history store karne ke liye ek HTML variable
+conversation_html = ""
+
+#Bot message ko HTML format mein convert karne ka function
+def format_bot_message_html(message):
+    """
+    Yeh function bot ka message ache HTML style mein convert karta hai,
+    jisme paragraphs aur bullet points ache se show hotay hain.
+    Bold text bhi <b> tag mein convert hota hai.
+    """
+    lines = message.split('\n')
+    ul_open = False
+    html = ""
+
+    for line in lines:
+        stripped_line = line.strip()
+
+        # Bullet points detect karna
+        if stripped_line.startswith(('* ', '- ')):
+            if not ul_open:
+                html += '<ul style="margin:10px 0; padding-left:20px; line-height:1.6;">'
+                ul_open = True
+            content = stripped_line[2:].strip()
+            content = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', content)
+            html += f"<li>{content}</li>"
+        elif stripped_line == "":
+            if ul_open:
+                html += "</ul>"
+                ul_open = False
+            html += "<br>"
+        else:
+            if ul_open:
+                html += "</ul>"
+                ul_open = False
+            content = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', stripped_line)
+            html += f'<p style="margin:10px 0; font-family: Arial, sans-serif; line-height:1.5;">{content}</p>'
+
+    if ul_open:
+        html += "</ul>"
+
+    return html
+
+#Chat window mein messages add karne ka function
+def add_message_to_html(message, sender="user"):
+    global conversation_html
+    if sender == "user":
+        # User ka message style ke sath right side pe
+        conversation_html += (
+            f'<p style="text-align:right; background:#d0e7ff; color:black; padding:8px 12px; '
+            f'border-radius:10px; margin:5px 0; max-width:75%; margin-left:auto; font-weight:bold;">'
+            f'You: {message}</p>'
+        )
+    else:
+        # Bot ka message formatting ke sath left side pe
+        formatted_message = format_bot_message_html(message)
+        conversation_html += (
+            f'<div style="text-align:left; background:#d4edda; color:black; padding:8px 12px; '
+            f'border-radius:10px; margin:5px 0; max-width:75%; margin-right:auto; font-weight:bold;">'
+            f'<strong>Mental Peace BOT:</strong><br>{formatted_message}</div>'
+        )
+    chat_history.value = conversation_html
+
+#User ka prompt AI model ko dene aur response lene ka main function
+def MentalPeaceAdvisor(user_prompt):
+    full_prompt = (
+        "You are a compassionate, supportive mental peace advisor chatbot. "
+        "Help users express and manage emotional stress. "
+        "You are a caring mental peace advisor chatbot."
+        "Respond with empathetic paragraphs, followed by clear bullet points if you suggest any actionable advice.\n\n\n"
+
+        "Guidelines:\n"
+        "1. If a user expresses sadness, comfort them and suggest uplifting activities.\n"
+        "2. If a user mentions criticism or being scolded, reassure them with kind compliments.\n"
+        "3. If a user is anxious or panicking, guide them through simple breathing exercises.\n"
+        "4. If a user mentions loneliness, suggest ways to connect with friends or family.\n"
+        "5. If a user shares grief, acknowledge gently and remind healing takes time.\n"
+        "6. If a user has low self-esteem, encourage with positive affirmations.\n"
+        "7. If the message includes 'quit', say 'Allah Hafiz! I feel happy to help you out!'\n"
+        "8. If unsure, ask for more details about their feelings.\n\n"
+
+        "Format your answer in multiple bullet points or clear paragraphs for better readability.\n\n"
+
+        f"User: {user_prompt}\n"
+        "Mental Peace BOT:"
+    )
+
+    # AI se response lena
+    response = model.generate_content(full_prompt)
+    bot_reply = response.text.strip()
+
+    if len(bot_reply) < 5:
+        return "Oh okay, I didn't get you. Can you please ask in more detail?"
+
+    return bot_reply
+
+#Jab send button click ho to yeh function chalega
+def on_send_clicked(b):
+    message = user_input.value.strip()
+    if not message:
+        return
+
+    # User aur bot ka message show karwana
+    add_message_to_html(message, "user")
+    reply = MentalPeaceAdvisor(message)
+    add_message_to_html(reply, "bot")
+    user_input.value = ''
+
+#Send button ke click event ko function se bind karna
+send_button.on_click(on_send_clicked)
+
+#User input area ka layout design karna
+input_area = widgets.HBox([user_input, send_button], layout=widgets.Layout(width='100%'))
+
+#Final chat UI display karwana
+display(chat_history, input_area)
