@@ -2,6 +2,7 @@ import streamlit as st
 from model_api import get_bot_response
 from chat_ui import display_conversation
 import speech_recognition as sr
+import google.generativeai as genai
 
 st.set_page_config(page_title="🧘 Mental Peace Advisor Bot", page_icon="💬", layout="centered")
 
