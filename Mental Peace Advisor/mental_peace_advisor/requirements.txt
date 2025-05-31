@@ -6,5 +6,4 @@ numpy
 SpeechRecognition
 gTTS
 PyAudio
-
 google-generativeai
