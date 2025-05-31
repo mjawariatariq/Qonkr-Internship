@@ -1,4 +1,4 @@
-import google.generativeai as ai
+import google.generativeai as genai
 from config import API_KEY, MODEL_NAME, GEN_CONFIG
 
 # Google generative AI ko API key se configure karna
